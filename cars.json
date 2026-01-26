@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Mercedes C220",
+    "year": "2019",
+    "km": "120000 km",
+    "price": "185 000 DH",
+    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
+    "description": "Excellent état, très propre, bien entretenue."
+  },
+  {
+    "name": "BMW Série 5",
+    "year": "2020",
+    "km": "90 000 km",
+    "price": "250 000 DH",
+    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
+    "description": "Très bon état, toutes options."
+  },
+  {
+    "name": "Audi A4",
+    "year": "2018",
+    "km": "150 000 km",
+    "price": "160 000 DH",
+    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
+    "description": "État impeccable, entretien régulier."
+  },
+  {
+    "name": "Volkswagen Golf",
+    "year": "2021",
+    "km": "50 000 km",
+    "price": "140 000 DH",
+    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
+    "description": "Neuve presque, garantie constructeur."
+  }
+]

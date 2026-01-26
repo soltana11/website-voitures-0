@@ -1,0 +1,114 @@
+// Load cars from JSON and display them on vehicles page
+async function loadCars() {
+  try {
+    // Check if cars are saved in localStorage (from admin panel)
+    const savedCars = localStorage.getItem('cars');
+    if (savedCars) {
+      const cars = JSON.parse(savedCars);
+      displayCars(cars);
+      return;
+    }
+    
+    // Otherwise fetch from cars.json
+    const response = await fetch('cars.json');
+    const cars = await response.json();
+    displayCars(cars);
+  } catch (error) {
+    console.error('Error loading cars:', error);
+  }
+}
+
+// Display cars in the vehicles grid
+function displayCars(cars) {
+  const vehiclesGrid = document.querySelector('.vehicles-grid');
+  if (!vehiclesGrid) return;
+
+  vehiclesGrid.innerHTML = '';
+
+  cars.forEach(car => {
+    const carCard = document.createElement('div');
+    carCard.className = 'car-card';
+
+    carCard.innerHTML = `
+      <img src="${car.image}" alt="${car.name}" class="car-image">
+      <div class="car-info">
+        <h3 class="car-name">${car.name}</h3>
+        <div class="car-details">
+          <span>${car.year}</span>
+          <span>${car.km}</span>
+        </div>
+        <div class="car-price">${car.price}</div>
+        <p class="car-description">${car.description}</p>
+        <a href="https://wa.me/212600000000?text=Je suis intéressé par ${car.name}" class="whatsapp-btn" target="_blank">
+          Contacter via WhatsApp
+        </a>
+      </div>
+    `;
+
+    vehiclesGrid.appendChild(carCard);
+  });
+}
+
+// Form validation for contact page
+function validateForm(event) {
+  event.preventDefault();
+
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+
+  if (!name || !email || !message) {
+    alert('Veuillez remplir tous les champs.');
+    return false;
+  }
+
+  if (!isValidEmail(email)) {
+    alert('Veuillez entrer une adresse email valide.');
+    return false;
+  }
+
+  // For now, just show a success message
+  alert('Merci pour votre message ! Nous vous contacterons bientôt.');
+  document.getElementById('contact-form').reset();
+  return false;
+}
+
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Smooth scrolling for navigation links
+function smoothScroll(target) {
+  const element = document.querySelector(target);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Load cars if on vehicles page
+  if (document.querySelector('.vehicles-grid')) {
+    loadCars();
+  }
+
+  // Form validation
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', validateForm);
+  }
+
+  // Smooth scrolling for nav links
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = this.getAttribute('href');
+      smoothScroll(target);
+    });
+  });
+});
