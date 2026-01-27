@@ -5,9 +5,8 @@
 1. **CLIENT_GUIDE.md** - Guide détaillé pour le client (FR)
 2. **QUICK_START.md** - Démarrage rapide (2 minutes)
 3. **CLOUDFLARE_DEPLOYMENT.md** - Déployer sur Cloudflare Pages ⭐ RECOMMENDED
-4. **GITHUB_NETLIFY_SETUP.md** - Guide déploiement Netlify
-5. **DECAP_CMS_SETUP.md** - Setup CMS avancé (optionnel)
-6. **Admin Panel** - Interface simple à `/admin/`
+4. **DECAP_CMS_SETUP.md** - Setup CMS avancé (optionnel)
+5. **Admin Panel** - Interface simple à `/admin/`
 
 ---
 
@@ -67,13 +66,13 @@ C'est gratuit et simple.
 
 ### Status Actuel:
 - ✅ GitHub: Configuré
-- ✅ Netlify: Prêt à déployer
+- ✅ Cloudflare Pages: Prêt à déployer
 - ✅ Admin Panel: Fonctionnel
 - ✅ Documentation: Complète
 
 ### Prochaines Étapes:
-1. Aller sur https://netlify.com
-2. Signer avec GitHub
+1. Aller sur https://dash.cloudflare.com
+2. Connecter votre compte GitHub
 3. Sélectionner le repo `website-voitures-0`
 4. Déployer (auto-config)
 

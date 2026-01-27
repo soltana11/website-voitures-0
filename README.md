@@ -1,4 +1,4 @@
-# Auto Prestige - Plateforme de Vente de Véhicules
+# BENA MOTORS - Plateforme de Vente de Véhicules
 
 Une plateforme web moderne pour la vente de véhicules d'occasion avec gestion administrative.
 
@@ -9,15 +9,16 @@ Une plateforme web moderne pour la vente de véhicules d'occasion avec gestion a
 - Section services
 - Page de contact centralisée
 - Interface d'administration pour gérer les véhicules
+- Galerie de véhicules vendus
 - Responsive design
-- Intégration WhatsApp
+- Intégration WhatsApp & Instagram
 
 ## Installation locale
 
 1. Clonez le référentiel:
 ```bash
-git clone https://github.com/votre-utilisateur/website-voitures-O.git
-cd website-voitures-O
+git clone https://github.com/soltana11/website-voitures-0.git
+cd website-voitures-0
 ```
 
 2. Lancez un serveur local:
@@ -34,13 +35,13 @@ Pour accéder au panneau d'administration:
 2. Vous pouvez ajouter, modifier et supprimer des véhicules
 3. Les données sont sauvegardées localement dans le navigateur
 
-**Note:** Sur Netlify, utilisez Netlify CMS pour une gestion persistante des données.
+## Déploiement sur Cloudflare Pages
 
-## Déploiement sur Netlify
-
-1. Connectez votre référentiel GitHub à Netlify
+1. Connectez votre référentiel GitHub à Cloudflare Pages
 2. Les paramètres de déploiement sont automatiquement configurés
 3. Chaque push sur `main` déclenche un redéploiement
+
+Voir: **CLOUDFLARE_DEPLOYMENT.md** pour les instructions détaillées
 
 ## Structure du projet
 
@@ -48,6 +49,14 @@ Pour accéder au panneau d'administration:
 .
 ├── index.html           # Page d'accueil
 ├── vehicles.html        # Catalogue de véhicules
+├── services.html        # Services
+├── contact.html         # Contact
+├── admin/              # Panneau d'administration
+├── cars.json           # Données des véhicules
+├── script.js           # Scripts JavaScript
+├── style.css           # Styles CSS
+└── images/             # Images du projet
+```
 ├── services.html        # Services proposés
 ├── contact.html         # Page de contact
 ├── admin/              # Panneau d'administration
