@@ -1,0 +1,23 @@
+backend:
+  name: github
+  repo: votre-utilisateur/website-voitures-O
+  branch: main
+  auth_endpoint: api/auth
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "vehicles"
+    label: "Véhicules"
+    folder: "_data"
+    create: true
+    slug: "{{slug}}"
+    format: "json"
+    fields:
+      - { label: "Nom du véhicule", name: "name", widget: "string" }
+      - { label: "Année", name: "year", widget: "string" }
+      - { label: "Kilométrage", name: "km", widget: "string" }
+      - { label: "Prix", name: "price", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Description", name: "description", widget: "text" }
