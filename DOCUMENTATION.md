@@ -4,9 +4,10 @@
 
 1. **CLIENT_GUIDE.md** - Guide détaillé pour le client (FR)
 2. **QUICK_START.md** - Démarrage rapide (2 minutes)
-3. **GITHUB_NETLIFY_SETUP.md** - Guide déploiement
-4. **DECAP_CMS_SETUP.md** - Setup CMS avancé (optionnel)
-5. **Admin Panel** - Interface simple à `/admin/`
+3. **CLOUDFLARE_DEPLOYMENT.md** - Déployer sur Cloudflare Pages ⭐ RECOMMENDED
+4. **GITHUB_NETLIFY_SETUP.md** - Guide déploiement Netlify
+5. **DECAP_CMS_SETUP.md** - Setup CMS avancé (optionnel)
+6. **Admin Panel** - Interface simple à `/admin/`
 
 ---
 
