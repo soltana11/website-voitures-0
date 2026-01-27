@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: votre-utilisateur/website-voitures-O
+  repo: soltana11/website-voitures-0
   branch: main
   auth_endpoint: api/auth
 
@@ -10,9 +10,9 @@ public_folder: "/images/uploads"
 collections:
   - name: "vehicles"
     label: "Véhicules"
-    folder: "_data"
+    folder: "_data/vehicles"
     create: true
-    slug: "{{slug}}"
+    slug: "{{name}}"
     format: "json"
     fields:
       - { label: "Nom du véhicule", name: "name", widget: "string" }
