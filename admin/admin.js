@@ -202,7 +202,6 @@ function saveCarsToServer(cars) {
   })
   .catch(error => console.error('Error:', error));
 }
-}
 
 // Show success message
 function showSuccessMessage(message) {
