@@ -114,17 +114,36 @@ nav {
 /* Hero Section */
 .hero {
   height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+              url('images/logo.png') center/contain no-repeat;
   background-color: #0d0d0d;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .hero-logo {
-  width: 250px;
-  height: auto;
-  object-fit: contain;
-  animation: fadeIn 0.8s ease-in;
+  display: none;
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
 }
 
 @keyframes fadeIn {
@@ -136,10 +155,6 @@ nav {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-.hero-content {
-  display: none;
 }
 
 .cta-btn {
