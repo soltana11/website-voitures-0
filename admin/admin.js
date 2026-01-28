@@ -34,14 +34,16 @@ function displayAdminVehicles(cars) {
   vehiclesList.innerHTML = '';
 
   cars.forEach((car, index) => {
+    const statusBadge = car.status === 'sold' ? '<span class="status-badge sold">VENDU</span>' : '<span class="status-badge available">DISPONIBLE</span>';
     const vehicleItem = document.createElement('div');
     vehicleItem.className = 'vehicle-item';
     vehicleItem.innerHTML = `
-      <h3>${car.name}</h3>
+      <h3>${car.name} ${statusBadge}</h3>
       <p><strong>Année:</strong> ${car.year}</p>
       <p><strong>Kilométrage:</strong> ${car.km}</p>
       <p><strong>Prix:</strong> ${car.price}</p>
       <p><strong>Description:</strong> ${car.description}</p>
+      <p><strong>Statut:</strong> ${car.status === 'sold' ? 'Vendu' : 'Disponible'}</p>
       <div class="vehicle-actions">
         <button class="btn-edit" onclick="editVehicle(${index})">Modifier</button>
         <button class="btn-delete" onclick="deleteVehicle(${index})">Supprimer</button>
@@ -63,6 +65,7 @@ function editVehicle(index) {
   document.getElementById('carPrice').value = car.price;
   document.getElementById('carImage').value = car.image;
   document.getElementById('carDescription').value = car.description;
+  document.getElementById('carStatus').value = car.status || 'available';
   
   editingIndex = index;
   
@@ -91,7 +94,8 @@ function handleFormSubmit(event) {
     km: document.getElementById('carKm').value,
     price: document.getElementById('carPrice').value,
     image: document.getElementById('carImage').value,
-    description: document.getElementById('carDescription').value
+    description: document.getElementById('carDescription').value,
+    status: document.getElementById('carStatus').value
   };
 
   let cars = JSON.parse(localStorage.getItem('cars')) || [];

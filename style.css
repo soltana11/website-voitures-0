@@ -41,11 +41,14 @@ nav {
 }
 
 .logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #d4af37;
+  display: inline-block;
   text-decoration: none;
+}
+
+.logo img {
+  height: 60px;
+  width: auto;
+  display: block;
 }
 
 .nav-links {

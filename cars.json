@@ -5,7 +5,8 @@
     "km": "120000 km",
     "price": "185 000 DH",
     "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Excellent état, très propre, bien entretenue."
+    "description": "Excellent état, très propre, bien entretenue.",
+    "status": "available"
   },
   {
     "name": "BMW Série 5",
@@ -13,7 +14,8 @@
     "km": "90 000 km",
     "price": "250 000 DH",
     "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Très bon état, toutes options."
+    "description": "Très bon état, toutes options.",
+    "status": "available"
   },
   {
     "name": "Audi A4",
@@ -21,7 +23,8 @@
     "km": "150 000 km",
     "price": "160 000 DH",
     "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "État impeccable, entretien régulier."
+    "description": "État impeccable, entretien régulier.",
+    "status": "available"
   },
   {
     "name": "Volkswagen Golf",
@@ -29,6 +32,7 @@
     "km": "50 000 km",
     "price": "140 000 DH",
     "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Neuve presque, garantie constructeur."
+    "description": "Neuve presque, garantie constructeur.",
+    "status": "available"
   }
 ]

@@ -6,6 +6,7 @@ async function loadCars() {
     if (savedCars) {
       const cars = JSON.parse(savedCars);
       displayCars(cars);
+      displaySoldVehicles(cars);
       return;
     }
     
@@ -13,6 +14,7 @@ async function loadCars() {
     const response = await fetch('cars.json');
     const cars = await response.json();
     displayCars(cars);
+    displaySoldVehicles(cars);
   } catch (error) {
     console.error('Error loading cars:', error);
   }
@@ -25,7 +27,10 @@ function displayCars(cars) {
 
   vehiclesGrid.innerHTML = '';
 
-  cars.forEach(car => {
+  // Filter only available cars
+  const availableCars = cars.filter(car => car.status !== 'sold');
+
+  availableCars.forEach(car => {
     const carCard = document.createElement('div');
     carCard.className = 'car-card';
 
@@ -46,6 +51,37 @@ function displayCars(cars) {
     `;
 
     vehiclesGrid.appendChild(carCard);
+  });
+}
+
+// Display sold vehicles
+function displaySoldVehicles(cars) {
+  const soldVehiclesGrid = document.querySelector('.sold-vehicles-grid');
+  if (!soldVehiclesGrid) return;
+
+  soldVehiclesGrid.innerHTML = '';
+
+  // Filter only sold cars
+  const soldCars = cars.filter(car => car.status === 'sold');
+
+  if (soldCars.length === 0) {
+    // If no sold cars from database, show the static cards (for initial demo)
+    return;
+  }
+
+  soldCars.forEach(car => {
+    const soldVehicleCard = document.createElement('div');
+    soldVehicleCard.className = 'sold-vehicle-card';
+
+    soldVehicleCard.innerHTML = `
+      <img src="${car.image}" alt="${car.name}">
+      <div class="sold-vehicle-info">
+        <h3>${car.name}</h3>
+        <p class="status">✓ Vendu</p>
+      </div>
+    `;
+
+    soldVehiclesGrid.appendChild(soldVehicleCard);
   });
 }
 

@@ -73,7 +73,8 @@
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: 0.8rem;
       border: 1px solid #333;
@@ -85,7 +86,8 @@
     }
 
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
       outline: none;
       border-color: #d4af37;
     }
@@ -161,6 +163,28 @@
       background-color: #c0392b;
     }
 
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+
+    .status-badge.available {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .status-badge.sold {
+      background-color: #e74c3c;
+      color: white;
+
+    .btn-delete:hover {
+      background-color: #c0392b;
+    }
+
     .success-message {
       background-color: #27ae60;
       color: white;
@@ -190,7 +214,7 @@
 <body>
   <header>
     <nav>
-      <a href="../index.html" class="logo">BENA MOTORS</a>
+      <a href="../index.html" class="logo"><img src="../images/logo.png" alt="BENA MOTORS Logo"></a>
       <ul class="nav-links">
         <li><a href="../index.html">Accueil</a></li>
         <li><a href="../vehicles.html">Véhicules</a></li>
@@ -243,6 +267,14 @@
           <div class="form-group">
             <label for="carDescription">Description</label>
             <textarea id="carDescription" name="carDescription" rows="4" required placeholder="Description du véhicule..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="carStatus">Statut du Véhicule</label>
+            <select id="carStatus" name="carStatus" required>
+              <option value="available">Disponible</option>
+              <option value="sold">Vendu</option>
+            </select>
           </div>
 
           <button type="submit" class="btn-submit">Ajouter/Mettre à jour</button>
