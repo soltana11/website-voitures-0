@@ -65,15 +65,16 @@ nav {
   padding: 0;
   margin: 0;
   object-fit: contain;
+  filter: brightness(0.9) contrast(1.1);
 }
 
 .nav-links {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   list-style: none;
-  gap: 1.5rem;
+  gap: 3rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .nav-links li {
