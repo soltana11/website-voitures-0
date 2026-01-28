@@ -69,13 +69,23 @@ function loadAdminVehicles() {
 
 // Display vehicles in admin panel
 function displayAdminVehicles(cars) {
+  console.log('displayAdminVehicles called with:', cars);
   const vehiclesList = document.getElementById('vehiclesList');
+  
+  if (!vehiclesList) {
+    console.error('vehiclesList element not found in displayAdminVehicles!');
+    return;
+  }
+  
   vehiclesList.innerHTML = '';
 
   if (!cars || cars.length === 0) {
+    console.log('No cars to display, showing empty message');
     vehiclesList.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire à gauche.</p>';
     return;
   }
+  
+  console.log('Displaying ' + cars.length + ' vehicles');
 
   cars.forEach((car, index) => {
     const statusBadge = car.status === 'sold' ? '<span class="status-badge sold">VENDU</span>' : '<span class="status-badge available">DISPONIBLE</span>';
