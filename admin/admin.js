@@ -30,8 +30,8 @@ function loadAdminVehicles() {
     return;
   }
   
-  // Always fetch fresh data from server to ensure we see latest data
-  const carsUrl = '../cars.json?t=' + new Date().getTime();
+  // Fetch from getCars.php with cache busting
+  const carsUrl = '../api/getCars.php?t=' + new Date().getTime();
   console.log('Fetching from:', carsUrl);
   
   fetch(carsUrl)
@@ -43,13 +43,13 @@ function loadAdminVehicles() {
       return response.json();
     })
     .then(data => {
-      console.log('Vehicles loaded from cars.json:', data);
+      console.log('Vehicles loaded from getCars.php:', data);
       // Save to localStorage for quick access
       localStorage.setItem('cars', JSON.stringify(data));
       displayAdminVehicles(data);
     })
     .catch(error => {
-      console.error('Error loading cars from cars.json:', error);
+      console.error('Error loading cars:', error);
       // If fetch fails, try localStorage
       let cars = localStorage.getItem('cars');
       if (cars) {
@@ -61,8 +61,8 @@ function loadAdminVehicles() {
           vehiclesList.innerHTML = '<p style="color: red;">Error loading vehicles. Please refresh the page.</p>';
         }
       } else {
-        console.error('No vehicles found in localStorage either');
-        vehiclesList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">No vehicles found. Add one using the form on the left.</p>';
+        console.log('No vehicles found');
+        vehiclesList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire à gauche.</p>';
       }
     });
 }
