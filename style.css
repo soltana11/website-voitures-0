@@ -41,7 +41,9 @@ nav {
 }
 
 .logo {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
   text-decoration: none;
 }
 
@@ -49,6 +51,13 @@ nav {
   height: 60px;
   width: auto;
   display: block;
+}
+
+.logo span {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #d4af37;
 }
 
 .nav-links {
