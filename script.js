@@ -3,8 +3,10 @@ async function loadCars() {
   try {
     // Fetch from PHP API to get fresh data and bypass browser cache
     // This ensures all users see the latest updates from admin
+    console.log('loadCars: Fetching from getCars.php');
     const response = await fetch('api/getCars.php?t=' + new Date().getTime());
     const cars = await response.json();
+    console.log('loadCars: Received cars:', cars);
     displayCars(cars);
     displaySoldVehicles(cars);
   } catch (error) {
@@ -15,12 +17,17 @@ async function loadCars() {
 // Display cars in the vehicles grid
 function displayCars(cars) {
   const vehiclesGrid = document.querySelector('.vehicles-grid');
-  if (!vehiclesGrid) return;
+  if (!vehiclesGrid) {
+    console.error('displayCars: vehicles-grid element not found!');
+    return;
+  }
 
+  console.log('displayCars: Grid found, clearing it');
   vehiclesGrid.innerHTML = '';
 
   // Filter only available cars
   const availableCars = cars.filter(car => car.status !== 'sold');
+  console.log('displayCars: Found ' + availableCars.length + ' available cars:', availableCars);
 
   availableCars.forEach(car => {
     const carCard = document.createElement('div');
