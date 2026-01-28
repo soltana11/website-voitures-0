@@ -1,8 +1,11 @@
 // Admin Panel Script
 let editingIndex = null;
 
+console.log('Admin panel script loaded');
+
 // Load vehicles when page loads
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, loading vehicles...');
   loadAdminVehicles();
   
   // Form submission
@@ -15,6 +18,7 @@ function loadAdminVehicles() {
   fetch('../cars.json?t=' + new Date().getTime())
     .then(response => response.json())
     .then(data => {
+      console.log('Vehicles loaded from cars.json:', data);
       // Save to localStorage for quick access
       localStorage.setItem('cars', JSON.stringify(data));
       displayAdminVehicles(data);
@@ -24,7 +28,10 @@ function loadAdminVehicles() {
       // If fetch fails, try localStorage
       let cars = localStorage.getItem('cars');
       if (cars) {
+        console.log('Using vehicles from localStorage');
         displayAdminVehicles(JSON.parse(cars));
+      } else {
+        console.error('No vehicles found in localStorage either');
       }
     });
 }
