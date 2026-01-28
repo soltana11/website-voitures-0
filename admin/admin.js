@@ -79,6 +79,10 @@ function deleteVehicle(index) {
     let cars = JSON.parse(localStorage.getItem('cars'));
     cars.splice(index, 1);
     localStorage.setItem('cars', JSON.stringify(cars));
+    
+    // Save to server so changes appear to all public users
+    saveCarsToServer(cars);
+    
     loadAdminVehicles();
     showSuccessMessage('Véhicule supprimé avec succès!');
   }
@@ -112,6 +116,9 @@ function handleFormSubmit(event) {
   // Save to localStorage
   localStorage.setItem('cars', JSON.stringify(cars));
 
+  // Save to server (cars.json) so changes appear to all public users
+  saveCarsToServer(cars);
+
   // Reset form
   document.getElementById('vehicleForm').reset();
 
@@ -120,6 +127,27 @@ function handleFormSubmit(event) {
 
   // Show success message
   showSuccessMessage('Véhicule sauvegardé avec succès!');
+}
+
+// Save cars data to server
+function saveCarsToServer(cars) {
+  fetch('../api/save-cars.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cars)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('Cars saved to server');
+    } else {
+      console.error('Error saving to server:', data.error);
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
 }
 
 // Show success message
