@@ -1,9 +1,9 @@
 // Load cars from JSON and display them on vehicles page
 async function loadCars() {
   try {
-    // Always fetch fresh data from cars.json for public users
-    // This ensures they see the latest updates from admin
-    const response = await fetch('cars.json?t=' + new Date().getTime());
+    // Fetch from PHP API to get fresh data and bypass browser cache
+    // This ensures all users see the latest updates from admin
+    const response = await fetch('api/getCars.php?t=' + new Date().getTime());
     const cars = await response.json();
     displayCars(cars);
     displaySoldVehicles(cars);
