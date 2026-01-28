@@ -1,4 +1,6 @@
 <?php
+// save-cars.php - Save cars data to SQLite database
+
 // Allow cross-origin requests
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
@@ -22,23 +24,47 @@ if (!$data || !is_array($data)) {
     exit;
 }
 
-// Path to cars.json file
-$filePath = dirname(__DIR__) . '/cars.json';
+// Database file path
+$dbFile = dirname(__DIR__) . '/cars.db';
 
-// Ensure the file is writable
-if (!is_writable(dirname($filePath))) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Cannot write to cars.json file']);
-    exit;
-}
+try {
+    // Create database connection
+    $pdo = new PDO('sqlite:' . $dbFile);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Write the data to cars.json with nice formatting
-$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-if (file_put_contents($filePath, $json) !== false) {
+    // Begin transaction
+    $pdo->beginTransaction();
+
+    // Clear existing data
+    $pdo->exec("DELETE FROM cars");
+
+    // Insert new data
+    $insertSQL = "INSERT INTO cars (name, year, km, price, image, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $pdo->prepare($insertSQL);
+
+    foreach ($data as $car) {
+        $stmt->execute([
+            $car['name'] ?? '',
+            $car['year'] ?? '',
+            $car['km'] ?? '',
+            $car['price'] ?? '',
+            $car['image'] ?? '',
+            $car['description'] ?? '',
+            $car['status'] ?? 'available'
+        ]);
+    }
+
+    // Commit transaction
+    $pdo->commit();
+
     http_response_code(200);
     echo json_encode(['success' => true, 'message' => 'Cars data saved successfully']);
-} else {
+} catch (PDOException $e) {
+    // Rollback on error
+    if (isset($pdo)) {
+        $pdo->rollBack();
+    }
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to save cars.json']);
+    echo json_encode(['error' => 'Failed to save data: ' . $e->getMessage()]);
 }
 ?>
