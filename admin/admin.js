@@ -6,17 +6,42 @@ console.log('Admin panel script loaded');
 // Load vehicles when page loads
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM loaded, loading vehicles...');
-  loadAdminVehicles();
+  
+  // Wait a tiny bit to ensure everything is ready
+  setTimeout(loadAdminVehicles, 100);
   
   // Form submission
-  document.getElementById('vehicleForm').addEventListener('submit', handleFormSubmit);
+  const form = document.getElementById('vehicleForm');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+    console.log('Form listener attached');
+  } else {
+    console.error('vehicleForm not found!');
+  }
 });
 
 // Load vehicles in admin panel
 function loadAdminVehicles() {
+  console.log('loadAdminVehicles called');
+  
+  const vehiclesList = document.getElementById('vehiclesList');
+  if (!vehiclesList) {
+    console.error('vehiclesList element not found!');
+    return;
+  }
+  
   // Always fetch fresh data from server to ensure we see latest data
-  fetch('../cars.json?t=' + new Date().getTime())
-    .then(response => response.json())
+  const carsUrl = '../cars.json?t=' + new Date().getTime();
+  console.log('Fetching from:', carsUrl);
+  
+  fetch(carsUrl)
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error('Network response was not ok: ' + response.status);
+      }
+      return response.json();
+    })
     .then(data => {
       console.log('Vehicles loaded from cars.json:', data);
       // Save to localStorage for quick access
@@ -24,14 +49,20 @@ function loadAdminVehicles() {
       displayAdminVehicles(data);
     })
     .catch(error => {
-      console.error('Error loading cars:', error);
+      console.error('Error loading cars from cars.json:', error);
       // If fetch fails, try localStorage
       let cars = localStorage.getItem('cars');
       if (cars) {
         console.log('Using vehicles from localStorage');
-        displayAdminVehicles(JSON.parse(cars));
+        try {
+          displayAdminVehicles(JSON.parse(cars));
+        } catch (parseError) {
+          console.error('Error parsing localStorage:', parseError);
+          vehiclesList.innerHTML = '<p style="color: red;">Error loading vehicles. Please refresh the page.</p>';
+        }
       } else {
         console.error('No vehicles found in localStorage either');
+        vehiclesList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">No vehicles found. Add one using the form on the left.</p>';
       }
     });
 }
