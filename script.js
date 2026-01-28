@@ -1,17 +1,9 @@
 // Load cars from JSON and display them on vehicles page
 async function loadCars() {
   try {
-    // Check if cars are saved in localStorage (from admin panel)
-    const savedCars = localStorage.getItem('cars');
-    if (savedCars) {
-      const cars = JSON.parse(savedCars);
-      displayCars(cars);
-      displaySoldVehicles(cars);
-      return;
-    }
-    
-    // Otherwise fetch from cars.json
-    const response = await fetch('cars.json');
+    // Always fetch fresh data from cars.json for public users
+    // This ensures they see the latest updates from admin
+    const response = await fetch('cars.json?t=' + new Date().getTime());
     const cars = await response.json();
     displayCars(cars);
     displaySoldVehicles(cars);
@@ -146,4 +138,10 @@ document.addEventListener('DOMContentLoaded', function() {
       smoothScroll(target);
     });
   });
+
+  // Auto-refresh vehicle data every 30 seconds if on vehicles page
+  // This ensures public users see latest updates from admin
+  if (document.querySelector('.vehicles-grid')) {
+    setInterval(loadCars, 30000);
+  }
 });
