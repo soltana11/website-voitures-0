@@ -34,6 +34,11 @@ function displayAdminVehicles(cars) {
   const vehiclesList = document.getElementById('vehiclesList');
   vehiclesList.innerHTML = '';
 
+  if (!cars || cars.length === 0) {
+    vehiclesList.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire à gauche.</p>';
+    return;
+  }
+
   cars.forEach((car, index) => {
     const statusBadge = car.status === 'sold' ? '<span class="status-badge sold">VENDU</span>' : '<span class="status-badge available">DISPONIBLE</span>';
     const vehicleItem = document.createElement('div');
