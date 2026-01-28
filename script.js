@@ -59,30 +59,29 @@ function displaySoldVehicles(cars) {
   const soldVehiclesGrid = document.querySelector('.sold-vehicles-grid');
   if (!soldVehiclesGrid) return;
 
-  soldVehiclesGrid.innerHTML = '';
-
   // Filter only sold cars
   const soldCars = cars.filter(car => car.status === 'sold');
 
-  if (soldCars.length === 0) {
-    // If no sold cars from database, show the static cards (for initial demo)
-    return;
+  // Only update if there are sold cars in the database
+  // Otherwise keep the existing static cards
+  if (soldCars.length > 0) {
+    soldVehiclesGrid.innerHTML = '';
+    
+    soldCars.forEach(car => {
+      const soldVehicleCard = document.createElement('div');
+      soldVehicleCard.className = 'sold-vehicle-card';
+
+      soldVehicleCard.innerHTML = `
+        <img src="${car.image}" alt="${car.name}">
+        <div class="sold-vehicle-info">
+          <h3>${car.name}</h3>
+          <p class="status">✓ Vendu</p>
+        </div>
+      `;
+
+      soldVehiclesGrid.appendChild(soldVehicleCard);
+    });
   }
-
-  soldCars.forEach(car => {
-    const soldVehicleCard = document.createElement('div');
-    soldVehicleCard.className = 'sold-vehicle-card';
-
-    soldVehicleCard.innerHTML = `
-      <img src="${car.image}" alt="${car.name}">
-      <div class="sold-vehicle-info">
-        <h3>${car.name}</h3>
-        <p class="status">✓ Vendu</p>
-      </div>
-    `;
-
-    soldVehiclesGrid.appendChild(soldVehicleCard);
-  });
 }
 
 // Form validation for contact page
