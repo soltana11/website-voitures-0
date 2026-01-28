@@ -11,21 +11,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load vehicles in admin panel
 function loadAdminVehicles() {
-  // Try to load from localStorage first (persistent storage)
-  let cars = localStorage.getItem('cars');
-  
-  if (!cars) {
-    // If not in localStorage, fetch from cars.json
-    fetch('../cars.json')
-      .then(response => response.json())
-      .then(data => {
-        localStorage.setItem('cars', JSON.stringify(data));
-        displayAdminVehicles(data);
-      })
-      .catch(error => console.error('Error loading cars:', error));
-  } else {
-    displayAdminVehicles(JSON.parse(cars));
-  }
+  // Always fetch fresh data from server to ensure we see latest data
+  fetch('../cars.json?t=' + new Date().getTime())
+    .then(response => response.json())
+    .then(data => {
+      // Save to localStorage for quick access
+      localStorage.setItem('cars', JSON.stringify(data));
+      displayAdminVehicles(data);
+    })
+    .catch(error => {
+      console.error('Error loading cars:', error);
+      // If fetch fails, try localStorage
+      let cars = localStorage.getItem('cars');
+      if (cars) {
+        displayAdminVehicles(JSON.parse(cars));
+      }
+    });
 }
 
 // Display vehicles in admin panel
