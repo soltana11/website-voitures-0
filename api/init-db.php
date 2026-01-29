@@ -1,12 +1,11 @@
 <?php
-// init-db.php - Initialize SQLite database and migrate data from cars.json
+// init-db.php - Initialize MySQL database and migrate data from cars.json
 
-// Database file path
-$dbFile = __DIR__ . '/../cars.db';
+require_once __DIR__ . '/../config.php';
 
 // Create database connection
 try {
-    $pdo = new PDO('sqlite:' . $dbFile);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Database connection established.\n";
 } catch (PDOException $e) {
@@ -16,14 +15,14 @@ try {
 // Create cars table
 $createTableSQL = "
 CREATE TABLE IF NOT EXISTS cars (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    year TEXT NOT NULL,
-    km TEXT NOT NULL,
-    price TEXT NOT NULL,
-    image TEXT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    year INT NOT NULL,
+    km INT NOT NULL,
+    price INT NOT NULL,
+    image VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    status TEXT DEFAULT 'available'
+    status VARCHAR(50) DEFAULT 'available'
 );
 ";
 
@@ -53,9 +52,9 @@ if (file_exists($carsJsonFile)) {
             foreach ($cars as $car) {
                 $stmt->execute([
                     $car['name'] ?? '',
-                    $car['year'] ?? '',
-                    $car['km'] ?? '',
-                    $car['price'] ?? '',
+                    (int)($car['year'] ?? 0),
+                    (int)($car['km'] ?? 0),
+                    (int)($car['price'] ?? 0),
                     $car['image'] ?? '',
                     $car['description'] ?? '',
                     $car['status'] ?? 'available'

@@ -185,7 +185,7 @@ function handleFormSubmit(event) {
 
 // Save cars data to server
 function saveCarsToServer(cars) {
-  fetch('../api/save-cars.php', {
+  fetch('https://website-voitures.mariaounassar2006.workers.dev/api/cars', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

@@ -1,16 +1,15 @@
 <?php
-// getCars.php - Read and return cars data from SQLite database
+// getCars.php - Read and return cars data from MySQL database
 
 // Set JSON response header
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// Database file path
-$dbFile = __DIR__ . '/../cars.db';
+require_once __DIR__ . '/../config.php';
 
 try {
     // Create database connection
-    $pdo = new PDO('sqlite:' . $dbFile);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Query all cars
