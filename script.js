@@ -3,7 +3,7 @@ async function loadCars() {
   try {
     // Fetch from API with cache busting to get fresh data from database
     console.log('loadCars: Fetching from API');
-    const response = await fetch('api/getCars.php?t=' + new Date().getTime());
+    const response = await fetch('/api/cars?t=' + new Date().getTime());
     const cars = await response.json();
     console.log('loadCars: Received cars:', cars);
     displayCars(cars);
