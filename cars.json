@@ -1,38 +1,23 @@
 [
+
   {
-    "name": "Mercedes C220",
-    "year": "2019",
-    "km": "120000 km",
-    "price": "185 000 DH",
-    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Excellent état, très propre, bien entretenue.",
-    "status": "available"
-  },
-  {
-    "name": "BMW Série 5",
+    "name": "BMW X1 220CH HYBRIDE",
     "year": "2020",
-    "km": "90 000 km",
-    "price": "250 000 DH",
-    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Très bon état, toutes options.",
+    "km": "75000 km",
+    "price": "25 500€",
+    "image": "images/1.jpg",
+    "description": "BENA MOTORS vous présente cette magnifique BMW X1 qui est encore garantie jusqu'au 10/09/2026 chez BM. Aucun frais n'est a prévoir sur le véhicule. Le CT est favorable et à moins de 6 mois. Double des clefs.",
     "status": "available"
   },
   {
-    "name": "Audi A4",
-    "year": "2018",
-    "km": "150 000 km",
-    "price": "160 000 DH",
-    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "État impeccable, entretien régulier.",
+    "name": "MEGANE III BOSE 1.6 DCI",
+    "year": "2013",
+    "km": "225 000 km",
+    "price": "5500€",
+    "image": "images/2.jpg",
+    "description": "BENA MOTORS vous propose cette très belle Mégane III. Três entretenue depuis sa mise en circulation.",
     "status": "available"
-  },
-  {
-    "name": "Volkswagen Golf",
-    "year": "2021",
-    "km": "50 000 km",
-    "price": "140 000 DH",
-    "image": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
-    "description": "Neuve presque, garantie constructeur.",
-    "status": "available"
+
   }
+
 ]
