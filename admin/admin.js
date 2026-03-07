@@ -1,91 +1,53 @@
-// Admin Panel Script
-let editingIndex = null;
+// Admin Panel Script (Firestore version)
+import { db } from '../firebase-config.js';
+import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-console.log('Admin panel script loaded');
+let editingId = null; // will store document ID when editing
 
-// Load vehicles when page loads
+console.log('Admin panel script loaded (Firestore)');
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, loading vehicles...');
-  
-  // Wait a tiny bit to ensure everything is ready
-  setTimeout(loadAdminVehicles, 100);
-  
-  // Form submission
+  console.log('DOM loaded, loading vehicles from Firestore...');
+  loadAdminVehicles();
+
   const form = document.getElementById('vehicleForm');
   if (form) {
     form.addEventListener('submit', handleFormSubmit);
-    console.log('Form listener attached');
-  } else {
-    console.error('vehicleForm not found!');
   }
 });
 
-// Load vehicles in admin panel
-function loadAdminVehicles() {
-  console.log('loadAdminVehicles called');
-  
+// Load vehicles from Firestore
+async function loadAdminVehicles() {
   const vehiclesList = document.getElementById('vehiclesList');
-  if (!vehiclesList) {
-    console.error('vehiclesList element not found!');
-    return;
-  }
-  
-  // Fetch from getCars.php with cache busting
-  const carsUrl = '../api/getCars.php?t=' + new Date().getTime();
-  console.log('Fetching from:', carsUrl);
-  
-  fetch(carsUrl)
-    .then(response => {
-      console.log('Response status:', response.status);
-      if (!response.ok) {
-        throw new Error('Network response was not ok: ' + response.status);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Vehicles loaded from getCars.php:', data);
-      // Save to localStorage for quick access
-      localStorage.setItem('cars', JSON.stringify(data));
-      displayAdminVehicles(data);
-    })
-    .catch(error => {
-      console.error('Error loading cars:', error);
-      // If fetch fails, try localStorage
-      let cars = localStorage.getItem('cars');
-      if (cars) {
-        console.log('Using vehicles from localStorage');
-        try {
-          displayAdminVehicles(JSON.parse(cars));
-        } catch (parseError) {
-          console.error('Error parsing localStorage:', parseError);
-          vehiclesList.innerHTML = '<p style="color: red;">Error loading vehicles. Please refresh the page.</p>';
-        }
-      } else {
-        console.log('No vehicles found');
-        vehiclesList.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire à gauche.</p>';
-      }
+  if (!vehiclesList) return;
+
+  vehiclesList.innerHTML = '<p>Chargement...</p>';
+
+  try {
+    const querySnapshot = await getDocs(collection(db, 'cars'));
+    const cars = [];
+    querySnapshot.forEach(docSnap => {
+      cars.push({ id: docSnap.id, ...docSnap.data() });
     });
+    localStorage.setItem('cars', JSON.stringify(cars));
+    displayAdminVehicles(cars);
+  } catch (error) {
+    console.error('Erreur Firestore:', error);
+    vehiclesList.innerHTML = '<p style="color:red;">Impossible de charger les véhicules.</p>';
+  }
 }
 
-// Display vehicles in admin panel
+// Display vehicles
 function displayAdminVehicles(cars) {
-  console.log('displayAdminVehicles called with:', cars);
   const vehiclesList = document.getElementById('vehiclesList');
-  
-  if (!vehiclesList) {
-    console.error('vehiclesList element not found in displayAdminVehicles!');
-    return;
-  }
-  
   vehiclesList.innerHTML = '';
 
   if (!cars || cars.length === 0) {
-    console.log('No cars to display, showing empty message');
-    vehiclesList.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire à gauche.</p>';
+    vehiclesList.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Aucun véhicule trouvé. Ajoutez-en un avec le formulaire.</p>';
     return;
   }
-  
-  console.log('Displaying ' + cars.length + ' vehicles');
 
   cars.forEach((car, index) => {
     const statusBadge = car.status === 'sold' ? '<span class="status-badge sold">VENDU</span>' : '<span class="status-badge available">DISPONIBLE</span>';
@@ -93,61 +55,60 @@ function displayAdminVehicles(cars) {
     vehicleItem.className = 'vehicle-item';
     vehicleItem.innerHTML = `
       <h3>${car.name} ${statusBadge}</h3>
-      <p><strong>Année:</strong> ${car.year}</p>
-      <p><strong>Kilométrage:</strong> ${car.km}</p>
-      <p><strong>Prix:</strong> ${car.price}</p>
-      <p><strong>Description:</strong> ${car.description}</p>
+      <p><strong>Marque:</strong> ${car.brand || ''}</p>
+      <p><strong>Année:</strong> ${car.year || ''}</p>
+      <p><strong>Kilométrage:</strong> ${car.km || ''}</p>
+      <p><strong>Prix:</strong> ${car.price || ''}</p>
+      <p><strong>Description:</strong> ${car.description || ''}</p>
       <p><strong>Statut:</strong> ${car.status === 'sold' ? 'Vendu' : 'Disponible'}</p>
       <div class="vehicle-actions">
-        <button class="btn-edit" onclick="editVehicle(${index})">Modifier</button>
-        <button class="btn-delete" onclick="deleteVehicle(${index})">Supprimer</button>
+        <button class="btn-edit" onclick="editVehicle('${car.id}')">Modifier</button>
+        <button class="btn-delete" onclick="deleteVehicle('${car.id}')">Supprimer</button>
       </div>
     `;
     vehiclesList.appendChild(vehicleItem);
   });
 }
 
-// Edit vehicle
-function editVehicle(index) {
-  const cars = JSON.parse(localStorage.getItem('cars'));
-  const car = cars[index];
-  
-  // Fill form with car data
+// Make functions global so buttons can call them
+window.editVehicle = editVehicle;
+window.deleteVehicle = deleteVehicle;
+
+function editVehicle(id) {
+  const cars = JSON.parse(localStorage.getItem('cars')) || [];
+  const car = cars.find(c => c.id === id);
+  if (!car) return;
+
   document.getElementById('carName').value = car.name;
-  document.getElementById('carYear').value = car.year;
-  document.getElementById('carKm').value = car.km;
-  document.getElementById('carPrice').value = car.price;
-  document.getElementById('carImage').value = car.image;
-  document.getElementById('carDescription').value = car.description;
+  document.getElementById('carBrand').value = car.brand || '';
+  document.getElementById('carYear').value = car.year || '';
+  document.getElementById('carKm').value = car.km || '';
+  document.getElementById('carPrice').value = car.price || '';
+  document.getElementById('carImage').value = car.image || '';
+  document.getElementById('carDescription').value = car.description || '';
   document.getElementById('carStatus').value = car.status || 'available';
-  
-  editingIndex = index;
-  
-  // Scroll to form
+
+  editingId = id;
   document.getElementById('vehicleForm').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Delete vehicle
-function deleteVehicle(index) {
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule?')) {
-    let cars = JSON.parse(localStorage.getItem('cars'));
-    cars.splice(index, 1);
-    localStorage.setItem('cars', JSON.stringify(cars));
-    
-    // Save to server so changes appear to all public users
-    saveCarsToServer(cars);
-    
-    loadAdminVehicles();
+async function deleteVehicle(id) {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule?')) return;
+  try {
+    await deleteDoc(doc(db, 'cars', id));
     showSuccessMessage('Véhicule supprimé avec succès!');
+    loadAdminVehicles();
+  } catch (err) {
+    console.error('delete error', err);
   }
 }
 
-// Handle form submission
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
   event.preventDefault();
 
-  const newCar = {
+  const carData = {
     name: document.getElementById('carName').value,
+    brand: document.getElementById('carBrand').value,
     year: document.getElementById('carYear').value,
     km: document.getElementById('carKm').value,
     price: document.getElementById('carPrice').value,
@@ -156,71 +117,27 @@ function handleFormSubmit(event) {
     status: document.getElementById('carStatus').value
   };
 
-  let cars = JSON.parse(localStorage.getItem('cars')) || [];
-
-  if (editingIndex !== null) {
-    // Update existing car
-    cars[editingIndex] = newCar;
-    editingIndex = null;
-  } else {
-    // Add new car
-    cars.push(newCar);
-  }
-
-  // Save to localStorage
-  localStorage.setItem('cars', JSON.stringify(cars));
-
-  // Save to server (cars.json) so changes appear to all public users
-  saveCarsToServer(cars);
-
-  // Reset form
-  document.getElementById('vehicleForm').reset();
-
-  // Reload vehicles list
-  loadAdminVehicles();
-
-  // Show success message
-  showSuccessMessage('Véhicule sauvegardé avec succès!');
-}
-
-// Save cars data to server
-function saveCarsToServer(cars) {
-  fetch('https://website-voitures.mariaounassar2006.workers.dev/api/cars', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(cars)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      console.log('Cars saved to server');
+  try {
+    if (editingId) {
+      await updateDoc(doc(db, 'cars', editingId), carData);
+      editingId = null;
     } else {
-      console.error('Error saving to server:', data.error);
+      await addDoc(collection(db, 'cars'), carData);
     }
-  })
-  .catch(error => console.error('Error:', error));
+    document.getElementById('vehicleForm').reset();
+    showSuccessMessage('Véhicule sauvegardé avec succès!');
+    loadAdminVehicles();
+  } catch (err) {
+    console.error('save error', err);
+  }
 }
 
-// Show success message
 function showSuccessMessage(message) {
   const successMessage = document.getElementById('successMessage');
   successMessage.textContent = message;
   successMessage.classList.add('show');
-
   setTimeout(() => {
     successMessage.classList.remove('show');
   }, 3000);
 }
 
-// Override loadCars to load from localStorage if available
-const originalLoadCars = window.loadCars;
-window.loadCars = async function() {
-  const cars = localStorage.getItem('cars');
-  if (cars) {
-    displayCars(JSON.parse(cars));
-  } else {
-    originalLoadCars();
-  }
-};

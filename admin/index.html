@@ -1,3 +1,5 @@
+<script type="module" src="../firebase-config.js"></script>
+<script type="module" src="admin.js"></script>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -224,7 +226,10 @@
   <div class="admin-container">
     <div class="admin-header">
       <h1>Panneau d'Administration</h1>
-      <a href="../index.html" class="btn-back">← Retour au site</a>
+      <div>
+        <a href="../index.html" class="btn-back">← Retour au site</a>
+        <button>id="logoutBtn" class="btn-back" style="margin-left:1rem;">Se déconnecter</button>
+      </div>
     </div>
 
     <div class="success-message" id="successMessage">
@@ -244,6 +249,11 @@
           <div class="form-group">
             <label for="carYear">Année</label>
             <input type="text" id="carYear" name="carYear" required placeholder="Ex: 2019">
+          </div>
+
+          <div class="form-group">
+            <label for="carBrand">Marque</label>
+            <input type="text" id="carBrand" name="carBrand" required placeholder="Ex: Mercedes">
           </div>
 
           <div class="form-group">
@@ -281,7 +291,7 @@
       <!-- Vehicles List Section -->
       <div class="vehicles-section">
         <h2>Véhicules Actuels (Disponibles & Vendus)</h2>
-        <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Tous les véhicules de votre base de données</p>
+        <p> style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Tous les véhicules de votre base de données</p>
         <div id="vehiclesList"></div>
       </div>
     </div>
@@ -313,6 +323,30 @@
   </footer>
 
   <script src="../script.js"></script>
-  <script src="admin.js"></script>
+  
+  <!-- load Firebase and ensure user is logged in -->
+  <script type="module">
+    import { auth } from '../firebase-config.js';
+    import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+
+    // redirect if not logged in
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = 'login.html';
+      }
+    });
+
+    // logout handling
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        signOut(auth).then(() => {
+          window.location.href = 'login.html';
+        });
+      });
+    }
+  </script>
+
+  <script type="module" src="admin.js"></script>
 </body>
 </html>

@@ -1,15 +1,25 @@
-// Load cars from cars.json and display them on vehicles page
+// Load cars from Firestore and display them on vehicles page
+import { db } from './firebase-config.js';
+import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
 async function loadCars() {
   try {
-    // Fetch from cars.json
-    console.log('loadCars: Fetching from cars.json');
-    const response = await fetch('cars.json');
-    const cars = await response.json();
-    console.log('loadCars: Received cars:', cars);
+    const cars = [];
+    const querySnapshot = await getDocs(collection(db, 'cars'));
+    querySnapshot.forEach(docSnap => cars.push(docSnap.data()));
     displayCars(cars);
     displaySoldVehicles(cars);
   } catch (error) {
-    console.error('Error loading cars:', error);
+    console.error('Error loading cars from Firestore:', error);
+    // fallback to JSON file
+    try {
+      const response = await fetch('cars.json');
+      const cars = await response.json();
+      displayCars(cars);
+      displaySoldVehicles(cars);
+    } catch (e) {
+      console.error('Fallback JSON also failed:', e);
+    }
   }
 }
 
@@ -36,6 +46,7 @@ function displayCars(cars) {
       <img src="${car.image}" alt="${car.name}" class="car-image">
       <div class="car-info">
         <h3 class="car-name">${car.name}</h3>
+        <p class="car-brand">${car.brand || ''}</p>
         <div class="car-details">
           <span>${car.year}</span>
           <span>${car.km}</span>
