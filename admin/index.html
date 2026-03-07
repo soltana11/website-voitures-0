@@ -197,16 +197,16 @@
       display: block;
     }
 
-    @media (max-width: 768px) {
-      .admin-content {
-        grid-template-columns: 1fr;
-      }
-
-      .admin-header {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
+  <style>
+    /* Hide admin content until authentication is verified */
+    .admin-container { display: none; }
+    .loading { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      font-size: 1.2rem; 
+      color: #d4af37; 
     }
   </style>
 </head>
@@ -223,12 +223,17 @@
     </nav>
   </header>
 
-  <div class="admin-container">
+  <!-- Loading screen while checking authentication -->
+  <div class="loading" id="loading">
+    <div>Vérification des autorisations d'accès...</div>
+  </div>
+
+  <div class="admin-container" id="adminContainer">
     <div class="admin-header">
       <h1>Panneau d'Administration</h1>
       <div>
         <a href="../index.html" class="btn-back">← Retour au site</a>
-        <button>id="logoutBtn" class="btn-back" style="margin-left:1rem;">Se déconnecter</button>
+        <button id="logoutBtn" class="btn-back" style="margin-left:1rem;">Se déconnecter</button>
       </div>
     </div>
 
@@ -322,16 +327,30 @@
     </div>
   </footer>
 
-  <script src="../script.js"></script>
-  
   <!-- load Firebase and ensure user is logged in -->
   <script type="module">
     import { auth } from '../firebase-config.js';
     import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
-    // redirect if not logged in
+    const adminContainer = document.getElementById('adminContainer');
+    const loading = document.getElementById('loading');
+
+    // Timeout fallback - if Firebase doesn't respond within 10 seconds, redirect to login
+    const authTimeout = setTimeout(() => {
+      console.warn('Authentication check timed out, redirecting to login');
+      window.location.href = 'login.html';
+    }, 10000);
+
+    // Check authentication state
     onAuthStateChanged(auth, user => {
-      if (!user) {
+      clearTimeout(authTimeout); // Clear the timeout since we got a response
+      
+      if (user) {
+        // User is signed in, show admin panel
+        loading.style.display = 'none';
+        adminContainer.style.display = 'block';
+      } else {
+        // User is signed out, redirect to login
         window.location.href = 'login.html';
       }
     });
