@@ -116,22 +116,33 @@ async function deleteVehicle(id) {
 
 async function handleFormSubmit(event) {
   event.preventDefault();
+  console.log('handleFormSubmit called');
 
   // prepare image URL, might come from hidden field or upload
   let imageUrl = document.getElementById('carImage').value || '';
   const fileInput = document.getElementById('carFile');
+  console.log('fileInput element:', fileInput);
+  if (fileInput && fileInput.files) {
+    console.log('fileInput.files length:', fileInput.files.length);
+  }
 
   // if file provided, upload to Firebase Storage
   if (fileInput && fileInput.files && fileInput.files.length > 0) {
     const file = fileInput.files[0];
+    console.log('Uploading file', file.name, file.size);
     const storage = getStorage();
     const storageRef = ref(storage, `cars/${Date.now()}_${file.name}`);
     try {
       const snapshot = await uploadBytes(storageRef, file);
       imageUrl = await getDownloadURL(snapshot.ref);
+      console.log('Uploaded, download URL:', imageUrl);
     } catch (uploadErr) {
       console.error('Upload failed', uploadErr);
+      // optionally inform admin
+      alert('Erreur lors du téléchargement de l\'image : ' + uploadErr.message);
     }
+  } else {
+    console.log('No file selected, using existing URL:', imageUrl);
   }
 
   const carData = {
