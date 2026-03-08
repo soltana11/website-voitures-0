@@ -1,6 +1,7 @@
 // Admin Panel Script (Firestore version)
 import { db } from '../firebase-config.js';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
 
 let editingId = null; // will store document ID when editing
 
@@ -88,6 +89,16 @@ function editVehicle(id) {
   document.getElementById('carDescription').value = car.description || '';
   document.getElementById('carStatus').value = car.status || 'available';
 
+  // show existing image preview
+  const previewDiv = document.getElementById('imagePreview');
+  if (previewDiv && car.image) {
+    previewDiv.innerHTML = `<img src="${car.image}" alt="Preview" style="max-width:200px;max-height:150px;object-fit:contain;">`;
+  }
+
+  // clear file input since we are using existing image URL unless changed
+  const fileInput = document.getElementById('carFile');
+  if (fileInput) fileInput.value = '';
+
   editingId = id;
   document.getElementById('vehicleForm').scrollIntoView({ behavior: 'smooth' });
 }
@@ -106,13 +117,30 @@ async function deleteVehicle(id) {
 async function handleFormSubmit(event) {
   event.preventDefault();
 
+  // prepare image URL, might come from hidden field or upload
+  let imageUrl = document.getElementById('carImage').value || '';
+  const fileInput = document.getElementById('carFile');
+
+  // if file provided, upload to Firebase Storage
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    const storage = getStorage();
+    const storageRef = ref(storage, `cars/${Date.now()}_${file.name}`);
+    try {
+      const snapshot = await uploadBytes(storageRef, file);
+      imageUrl = await getDownloadURL(snapshot.ref);
+    } catch (uploadErr) {
+      console.error('Upload failed', uploadErr);
+    }
+  }
+
   const carData = {
     name: document.getElementById('carName').value,
     brand: document.getElementById('carBrand').value,
     year: document.getElementById('carYear').value,
     km: document.getElementById('carKm').value,
     price: document.getElementById('carPrice').value,
-    image: document.getElementById('carImage').value,
+    image: imageUrl,
     description: document.getElementById('carDescription').value,
     status: document.getElementById('carStatus').value
   };
@@ -125,6 +153,9 @@ async function handleFormSubmit(event) {
       await addDoc(collection(db, 'cars'), carData);
     }
     document.getElementById('vehicleForm').reset();
+    // clear preview image
+    const previewDiv = document.getElementById('imagePreview');
+    if (previewDiv) previewDiv.innerHTML = '';
     showSuccessMessage('Véhicule sauvegardé avec succès!');
     loadAdminVehicles();
   } catch (err) {

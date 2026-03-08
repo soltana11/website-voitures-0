@@ -272,8 +272,11 @@
           </div>
 
           <div class="form-group">
-            <label for="carImage">URL de l'image</label>
-            <input type="url" id="carImage" name="carImage" required placeholder="https://...">
+            <label for="carFile">Image du véhicule</label>
+            <input type="file" id="carFile" name="carFile" accept="image/*">
+            <!-- hidden field to carry existing URL when editing -->
+            <input type="hidden" id="carImage" name="carImage">
+            <div id="imagePreview" style="margin-top:0.5rem;"></div>
           </div>
 
           <div class="form-group">
@@ -362,6 +365,20 @@
         signOut(auth).then(() => {
           window.location.href = 'login.html';
         });
+      });
+    }
+    // update preview when a new file is selected
+    const fileInput = document.getElementById('carFile');
+    const previewDiv = document.getElementById('imagePreview');
+    if (fileInput) {
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          previewDiv.innerHTML = `<img src="${url}" alt="Preview" style="max-width:200px;max-height:150px;object-fit:contain;">`;
+        } else {
+          previewDiv.innerHTML = '';
+        }
       });
     }
   </script>
