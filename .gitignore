@@ -6,3 +6,7 @@ node_modules/
 dist/
 build/
 .wrangler/tmp/
+
+.dev.vars*
+!.dev.vars.example
+!.env.example
