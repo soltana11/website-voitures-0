@@ -1,5 +1,5 @@
 // Admin Panel Script (Firestore version)
-import { db } from '../firebase-config.js';
+import { db, app } from '../firebase-config.js';
 import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
 
@@ -118,59 +118,129 @@ async function handleFormSubmit(event) {
   event.preventDefault();
   console.log('handleFormSubmit called');
 
-  // prepare image URL, might come from hidden field or upload
-  let imageUrl = document.getElementById('carImage').value || '';
-  const fileInput = document.getElementById('carFile');
-  console.log('fileInput element:', fileInput);
-  if (fileInput && fileInput.files) {
-    console.log('fileInput.files length:', fileInput.files.length);
-  }
-
-  // if file provided, upload to Firebase Storage
-  if (fileInput && fileInput.files && fileInput.files.length > 0) {
-    const file = fileInput.files[0];
-    console.log('Uploading file', file.name, file.size);
-    const storage = getStorage();
-    const storageRef = ref(storage, `cars/${Date.now()}_${file.name}`);
-    try {
-      const snapshot = await uploadBytes(storageRef, file);
-      imageUrl = await getDownloadURL(snapshot.ref);
-      console.log('Uploaded, download URL:', imageUrl);
-    } catch (uploadErr) {
-      console.error('Upload failed', uploadErr);
-      // optionally inform admin
-      alert('Erreur lors du téléchargement de l\'image : ' + uploadErr.message);
-    }
-  } else {
-    console.log('No file selected, using existing URL:', imageUrl);
-  }
-
-  const carData = {
-    name: document.getElementById('carName').value,
-    brand: document.getElementById('carBrand').value,
-    year: document.getElementById('carYear').value,
-    km: document.getElementById('carKm').value,
-    price: document.getElementById('carPrice').value,
-    image: imageUrl,
-    description: document.getElementById('carDescription').value,
-    status: document.getElementById('carStatus').value
-  };
-
   try {
+    // Get form values
+    const name = document.getElementById('carName').value.trim();
+    const brand = document.getElementById('carBrand').value.trim();
+    const year = document.getElementById('carYear').value.trim();
+    const km = document.getElementById('carKm').value.trim();
+    const price = document.getElementById('carPrice').value.trim();
+    const description = document.getElementById('carDescription').value.trim();
+    const status = document.getElementById('carStatus').value;
+
+    // Validate required fields
+    if (!name || !brand || !year || !km || !price || !description) {
+      alert('Veuillez remplir tous les champs requis.');
+      return;
+    }
+
+    let imageUrl = '';
+
+    // Handle image upload if file is selected
+    const fileInput = document.getElementById('carFile');
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Veuillez sélectionner un fichier image valide.');
+        console.error('Invalid file type:', file.type);
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('L\'image ne doit pas dépasser 5MB.');
+        console.error('File too large:', file.size);
+        return;
+      }
+
+      console.log('Initializing Firebase Storage...');
+      const storage = getStorage(app);
+      console.log('Storage initialized:', storage);
+
+      const fileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+      const storagePath = `cars/${Date.now()}_${fileName}`;
+      console.log('Storage path:', storagePath);
+
+      const storageRef = ref(storage, storagePath);
+      console.log('Storage ref created:', storageRef);
+
+      try {
+        console.log('Starting upload...');
+        const snapshot = await uploadBytes(storageRef, file);
+        console.log('Upload successful! Snapshot:', snapshot);
+
+        console.log('Getting download URL...');
+        imageUrl = await getDownloadURL(snapshot.ref);
+        console.log('Download URL obtained:', imageUrl);
+
+      } catch (uploadError) {
+        console.error('Upload error details:', uploadError);
+        console.error('Error code:', uploadError.code);
+        console.error('Error message:', uploadError.message);
+
+        let errorMessage = 'Erreur lors du téléchargement de l\'image: ';
+        if (uploadError.code === 'storage/unauthorized') {
+          errorMessage += 'Accès non autorisé. Vérifiez les règles de stockage Firebase.';
+        } else if (uploadError.code === 'storage/canceled') {
+          errorMessage += 'Téléchargement annulé.';
+        } else if (uploadError.code === 'storage/quota-exceeded') {
+          errorMessage += 'Quota dépassé.';
+        } else {
+          errorMessage += uploadError.message;
+        }
+
+        alert(errorMessage);
+        return;
+      }
+    } else {
+      console.log('No image file selected, proceeding without image');
+    }
+
+    // Prepare car data
+    const carData = {
+      name,
+      brand,
+      year,
+      km,
+      price,
+      description,
+      status,
+      image: imageUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    console.log('Final car data to save:', carData);
+
+    // Save to Firestore
     if (editingId) {
+      console.log('Updating existing car with ID:', editingId);
       await updateDoc(doc(db, 'cars', editingId), carData);
+      console.log('Car updated successfully');
       editingId = null;
     } else {
+      console.log('Adding new car to Firestore');
       await addDoc(collection(db, 'cars'), carData);
+      console.log('Car added successfully');
     }
+
+    // Reset form and clear preview
     document.getElementById('vehicleForm').reset();
-    // clear preview image
     const previewDiv = document.getElementById('imagePreview');
     if (previewDiv) previewDiv.innerHTML = '';
-    showSuccessMessage('Véhicule sauvegardé avec succès!');
+
+    // Reload vehicles list
     loadAdminVehicles();
-  } catch (err) {
-    console.error('save error', err);
+
+    // Show success message
+    showSuccessMessage('Véhicule sauvegardé avec succès!');
+
+  } catch (error) {
+    console.error('Unexpected error in handleFormSubmit:', error);
+    console.error('Error stack:', error.stack);
+    alert('Erreur inattendue lors de la sauvegarde: ' + error.message);
   }
 }
 

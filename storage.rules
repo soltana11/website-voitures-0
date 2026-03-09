@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /cars/{allPaths=**} {
+      // only authenticated users may upload or read
+      allow read, write: if request.auth != null;
+    }
+  }
+}
