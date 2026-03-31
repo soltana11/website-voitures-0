@@ -119,7 +119,7 @@ async function handleFormSubmit(event) {
   console.log('handleFormSubmit called');
 
   try {
-    // Get form values
+    // Step 1: Get form values
     const name = document.getElementById('carName').value.trim();
     const brand = document.getElementById('carBrand').value.trim();
     const year = document.getElementById('carYear').value.trim();
@@ -128,15 +128,26 @@ async function handleFormSubmit(event) {
     const description = document.getElementById('carDescription').value.trim();
     const status = document.getElementById('carStatus').value;
 
-    // Validate required fields
+    // Step 2: Validate required fields
     if (!name || !brand || !year || !km || !price || !description) {
       alert('Veuillez remplir tous les champs requis.');
       return;
     }
 
+    // Step 3: Initialize image URL - use existing image if editing, otherwise default placeholder
     let imageUrl = '';
+    if (editingId) {
+      // If editing, get the existing car's image URL to preserve it if no new image is uploaded
+      const cars = JSON.parse(localStorage.getItem('cars')) || [];
+      const existingCar = cars.find(c => c.id === editingId);
+      imageUrl = existingCar ? existingCar.image || '' : '';
+    }
+    // If no image URL yet, set to default placeholder
+    if (!imageUrl) {
+      imageUrl = 'https://via.placeholder.com/300x200?text=No+Image+Available'; // Default placeholder image URL
+    }
 
-    // Handle image upload if file is selected
+    // Step 4: Handle image upload if a file is selected
     const fileInput = document.getElementById('carFile');
     if (fileInput && fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
@@ -160,6 +171,7 @@ async function handleFormSubmit(event) {
       const storage = getStorage(app);
       console.log('Storage initialized:', storage);
 
+      // Create a unique filename to avoid conflicts
       const fileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
       const storagePath = `cars/${Date.now()}_${fileName}`;
       console.log('Storage path:', storagePath);
@@ -168,11 +180,13 @@ async function handleFormSubmit(event) {
       console.log('Storage ref created:', storageRef);
 
       try {
-        console.log('Starting upload...');
+        console.log('Starting upload to Firebase Storage...');
+        // Upload the file using async/await - Firebase handles retries internally to prevent "retry-limit-exceeded"
         const snapshot = await uploadBytes(storageRef, file);
         console.log('Upload successful! Snapshot:', snapshot);
 
-        console.log('Getting download URL...');
+        console.log('Getting download URL from Firebase Storage...');
+        // Get the download URL after successful upload
         imageUrl = await getDownloadURL(snapshot.ref);
         console.log('Download URL obtained:', imageUrl);
 
@@ -181,6 +195,7 @@ async function handleFormSubmit(event) {
         console.error('Error code:', uploadError.code);
         console.error('Error message:', uploadError.message);
 
+        // Handle specific Firebase Storage errors to prevent retry issues
         let errorMessage = 'Erreur lors du téléchargement de l\'image: ';
         if (uploadError.code === 'storage/unauthorized') {
           errorMessage += 'Accès non autorisé. Vérifiez les règles de stockage Firebase.';
@@ -188,18 +203,20 @@ async function handleFormSubmit(event) {
           errorMessage += 'Téléchargement annulé.';
         } else if (uploadError.code === 'storage/quota-exceeded') {
           errorMessage += 'Quota dépassé.';
+        } else if (uploadError.code === 'storage/retry-limit-exceeded') {
+          errorMessage += 'Limite de tentatives dépassée. Vérifiez votre connexion internet.';
         } else {
           errorMessage += uploadError.message;
         }
 
-        alert(errorMessage);
-        return;
+        alert(errorMessage + ' Le véhicule sera ajouté avec l\'image par défaut.');
+        // Continue with default image URL (already set above)
       }
     } else {
-      console.log('No image file selected, proceeding without image');
+      console.log('No new image file selected, using existing or default image URL');
     }
-
-    // Prepare car data
+    
+    // Step 5: Prepare car data with the image URL
     const carData = {
       name,
       brand,
@@ -208,13 +225,13 @@ async function handleFormSubmit(event) {
       price,
       description,
       status,
-      image: imageUrl,
+      image: imageUrl, // This will be the uploaded URL or default placeholder
       createdAt: new Date().toISOString()
     };
 
     console.log('Final car data to save:', carData);
 
-    // Save to Firestore
+    // Step 6: Save to Firestore
     if (editingId) {
       console.log('Updating existing car with ID:', editingId);
       await updateDoc(doc(db, 'cars', editingId), carData);
@@ -226,15 +243,13 @@ async function handleFormSubmit(event) {
       console.log('Car added successfully');
     }
 
-    // Reset form and clear preview
+    // Step 7: Reset form and clear preview
     document.getElementById('vehicleForm').reset();
     const previewDiv = document.getElementById('imagePreview');
     if (previewDiv) previewDiv.innerHTML = '';
 
-    // Reload vehicles list
+    // Step 8: Reload vehicles list and show success message
     loadAdminVehicles();
-
-    // Show success message
     showSuccessMessage('Véhicule sauvegardé avec succès!');
 
   } catch (error) {

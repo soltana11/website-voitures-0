@@ -298,7 +298,6 @@
       <!-- Vehicles List Section -->
       <div class="vehicles-section">
         <h2>Véhicules Actuels (Disponibles & Vendus)</h2>
-        <p> style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">Tous les véhicules de votre base de données</p>
         <div id="vehiclesList"></div>
       </div>
     </div>
@@ -367,6 +366,7 @@
       });
     }
     // update preview when a new file is selected
+    document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('carFile');
     const previewDiv = document.getElementById('imagePreview');
     if (fileInput) {
@@ -375,11 +375,13 @@
         if (file) {
           const url = URL.createObjectURL(file);
           previewDiv.innerHTML = `<img src="${url}" alt="Vehicle image preview for admin upload, showing the selected car photo before saving to the database" style="max-width:200px;max-height:150px;object-fit:contain;">`;
+          setTimeout(() => URL.revokeObjectURL(url), 10000); // release memory after 10 seconds
         } else {
           previewDiv.innerHTML = '';
         }
       });
-    }
+    }});
+
   </script>
 
   <script type="module" src="admin.js"></script>
